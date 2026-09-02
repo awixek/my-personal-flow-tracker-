@@ -1,0 +1,284 @@
+/* ============================================================
+   Core Architect — design tokens
+   Motif: instruments/vessels — a study session is something you
+   fill up, like a beaker. Black-ruled containers, one living
+   accent (the liquid), everything else quiet.
+   ============================================================ */
+
+@font-face {
+  font-family: "Fraunces";
+  src: local("Georgia");
+  font-display: swap;
+}
+
+:root {
+  --paper: #f6f7f1;       /* base background — pale, slightly green-grey, not cream */
+  --ink: #111111;         /* text + rules */
+  --line: #000000;        /* the "black border" the brief calls for */
+  --liquid: #79c24c;      /* light-green fill */
+  --liquid-dim: #cfe8bb;  /* resting/empty state of a liquid vessel */
+  --muted: #6b6f66;
+  --danger: #b23b3b;
+
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---------- shared vessel container ---------- */
+.vessel {
+  border: 2px solid var(--line);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.vessel-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--liquid);
+  transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------- auth screen ---------- */
+.auth-screen {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding: 24px;
+}
+
+@media (min-width: 900px) {
+  .auth-screen {
+    grid-template-columns: 1.1fr 0.9fr;
+    padding: 0;
+  }
+}
+
+.auth-intro {
+  display: none;
+  padding: 64px;
+  height: 100%;
+}
+
+@media (min-width: 900px) {
+  .auth-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 2px solid var(--line);
+    min-height: 100dvh;
+  }
+}
+
+.auth-mark {
+  width: 40px;
+  height: 56px;
+  margin-bottom: 32px;
+}
+
+.auth-intro h1 {
+  font-family: var(--font-display);
+  font-size: 44px;
+  line-height: 1.08;
+  font-weight: 400;
+  max-width: 11ch;
+  margin: 0 0 20px;
+}
+
+.auth-intro p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 34ch;
+  margin: 0;
+}
+
+.auth-panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 40px 8px;
+}
+
+.auth-panel h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0 0 6px;
+}
+
+.auth-panel .sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0 0 28px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--ink);
+}
+
+.field input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 2px solid var(--line);
+  background: #fff;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.field input:focus {
+  outline: 3px solid var(--liquid);
+  outline-offset: -1px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: #fff;
+  border: 2px solid var(--line);
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.btn-primary:hover {
+  background: var(--liquid);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.switch-mode {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.switch-mode button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.form-error {
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.form-note {
+  border: 2px solid var(--line);
+  background: var(--liquid-dim);
+  color: var(--ink);
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* ---------- dashboard placeholder (Phase 1 stub) ---------- */
+.dash-shell {
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+@media (min-width: 700px) {
+  .dash-shell {
+    padding: 40px;
+  }
+}
+
+.dash-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+
+.dash-top .who {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.dash-top button {
+  background: none;
+  border: 2px solid var(--line);
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dash-top button:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+.dash-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 16px;
+}
+
+.dash-vessel {
+  width: 64px;
+  height: 88px;
+  margin-bottom: 28px;
+}
+
+.dash-center h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 28px;
+  margin: 0 0 10px;
+}
+
+.dash-center p {
+  color: var(--muted);
+  font-size: 15px;
+  max-width: 42ch;
+  line-height: 1.6;
+}
