@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ensureTodayTasks } from "@/lib/roadmap/generate-today";
 import SignOutButton from "./sign-out-button";
@@ -31,7 +32,12 @@ export default async function DashboardPage() {
     <div className="dash-shell">
       <div className="dash-top">
         <span className="who">{user.email}</span>
-        <SignOutButton />
+        <div className="dash-top-actions">
+          <Link href="/profile" className="profile-link">
+            Profile
+          </Link>
+          <SignOutButton />
+        </div>
       </div>
       <DashboardClient
         initialMainTasks={mainTasks}
