@@ -508,3 +508,92 @@ button {
   background: var(--liquid);
   color: var(--ink);
 }
+
+/* ---------- dashboard top actions (profile link + sign out) ---------- */
+.dash-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-link {
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 8px 14px;
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.profile-link:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ---------- streak heatmap (profile page) ---------- */
+.heatmap-header {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 19px;
+  margin: 8px 0 28px;
+}
+
+.heatmap-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.heatmap-daylabels {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+  padding-top: 0;
+}
+
+.heatmap-daylabel {
+  width: 13px;
+  height: 13px;
+  font-size: 9px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heatmap-grid {
+  display: flex;
+  gap: 3px;
+}
+
+.heatmap-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.heatmap-cell {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  border: 1px solid var(--line);
+  background: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.heatmap-cell--blank {
+  border: none;
+  background: transparent;
+}
+
+.heatmap-cell-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--liquid);
+}
