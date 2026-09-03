@@ -282,3 +282,229 @@ button {
   max-width: 42ch;
   line-height: 1.6;
 }
+
+/* ---------- persistent top timer bar ---------- */
+.timer-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+}
+
+.timer-bar-daily {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.mini-vessel {
+  position: relative;
+  width: 16px;
+  height: 22px;
+  border: 2px solid var(--line);
+  overflow: hidden;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.mini-vessel-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--liquid);
+  transition: height 0.4s ease;
+}
+
+.timer-bar-active {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.timer-bar-title {
+  font-weight: 600;
+}
+
+.timer-bar-clock {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+.timer-bar-btn {
+  border: 2px solid var(--line);
+  background: var(--ink);
+  color: #fff;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.timer-bar-btn:hover {
+  background: var(--liquid);
+  color: var(--ink);
+}
+
+.timer-bar-idle {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.break-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 2px solid var(--line);
+  background: var(--liquid-dim);
+  padding: 10px 14px;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.break-notice button {
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 5px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.break-notice button:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* ---------- Main Task boxes (roadmap view) ---------- */
+.task-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 800px) {
+  .task-grid {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.main-task-box {
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 18px;
+  min-width: 0;
+  flex-basis: 0;
+  transition: background 0.5s ease;
+}
+
+.main-task-box--complete {
+  background: var(--liquid-dim);
+}
+
+.main-task-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.main-task-head h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 17px;
+  margin: 0;
+}
+
+.main-task-pct {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.main-task-line {
+  height: 8px;
+  border: 2px solid var(--line);
+  background: #fff;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.main-task-line-fill {
+  height: 100%;
+  background: var(--liquid);
+  transition: width 0.4s ease;
+}
+
+.sub-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sub-task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+}
+
+.sub-task--active {
+  border-color: var(--line);
+  background: #fbfff7;
+}
+
+.sub-task--done {
+  color: var(--muted);
+}
+
+.sub-task--done span:first-child {
+  text-decoration: line-through;
+}
+
+.sub-task-right {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.sub-task-live {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.sub-task-locked {
+  color: var(--muted);
+}
+
+.sub-task-start {
+  border: 2px solid var(--line);
+  background: var(--ink);
+  color: #fff;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sub-task-start:hover {
+  background: var(--liquid);
+  color: var(--ink);
+}
