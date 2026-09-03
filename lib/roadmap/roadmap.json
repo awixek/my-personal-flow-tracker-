@@ -1,0 +1,156 @@
+{
+  "roadmap_name": "RealPathFlow",
+  "description": "DSA + Data Science, IITM BS Track — 4 parallel Main Tasks, time-share weighted, running across 4 macro Phases (Year 1 -> Year 4.5).",
+  "version": "1.0",
+
+  "notes_for_engine": [
+    "This file is a TEMPLATE, not a day-by-day log. The Phase 2 loader expands it into actual main_tasks/sub_tasks rows (one row per real calendar date) by combining: (1) the weekly_schedule below for the day-of-week, (2) the active phase for that date from the phases table, and (3) any exam_week flag the user sets for IITM term-end weeks.",
+    "time_share for each Main Task on a given day is NOT hardcoded — the engine computes it live as: (that Main Task's planned_seconds that day) / (sum of planned_seconds of every Main Task active that day). This matches schema.sql's main_tasks.time_share column, which the loader fills in at generation time.",
+    "Main Task D (Portfolio & Community): on any day where zero of its sub_tasks are scheduled, D is NOT generated as a row at all that day -- no box, not counted in the day's total planned time. This was an explicit decision, not a default.",
+    "Phase table below changes WHAT fills Main Task B's and C's sub-tasks (difficulty level / problem type), it does not change the structure (order, count, or duration) of sub-tasks -- store phase-driven content as metadata on the sub-task row (e.g. 'difficulty: Easy'), not as a new sub-task."
+  ],
+
+  "phases": [
+    {
+      "phase": 1,
+      "duration_label": "Yr 1 - 1.5 (T1-4)",
+      "iitm_level": "Foundation",
+      "dsa_focus": "Syntax, Arrays, Recursion, Sorting",
+      "dsa_difficulty": "Easy",
+      "ds_focus": "EDA, Data Cleaning (starts Month 6)",
+      "milestone": "LeetCode Easy x100",
+      "weekly_contest_active": false
+    },
+    {
+      "phase": 2,
+      "duration_label": "Yr 1.5 - 3 (T5-9)",
+      "iitm_level": "Diploma (Programming + Data Science)",
+      "dsa_focus": "Trees, Graphs, DP, Heaps, Two-Pointers",
+      "dsa_difficulty": "Medium",
+      "ds_focus": "Kaggle Beginner competitions",
+      "milestone": "300+ solved; internship applications (Month 18-24)",
+      "weekly_contest_active": false
+    },
+    {
+      "phase": 3,
+      "duration_label": "Yr 3 - 4.5 (T10-13)",
+      "iitm_level": "BSc/BS + Capstone",
+      "dsa_focus": "Advanced Graphs, Hard patterns, LLD/HLD",
+      "dsa_difficulty": "Hard",
+      "ds_focus": "Tabular/NLP competitions, MLOps stack",
+      "milestone": "500+ solved; 6-month SDE/ML internship",
+      "weekly_contest_active": true
+    },
+    {
+      "phase": 4,
+      "duration_label": "Yr 4 - 4.5",
+      "iitm_level": "Placement",
+      "dsa_focus": "Mock interviews, HLD mastery",
+      "dsa_difficulty": "Hard (interview-pattern)",
+      "ds_focus": "Portfolio finalization",
+      "milestone": "SDE-1 / DE / MLE placement (30-50 LPA target)",
+      "weekly_contest_active": true
+    }
+  ],
+
+  "main_tasks": [
+    {
+      "source_key": "iitm-coursework",
+      "title": "IITM Coursework",
+      "schedule_type": "daily",
+      "sub_tasks": [
+        { "source_key": "video-content", "title": "Watch/complete week's video content", "sequence": 0, "planned_minutes": 40 },
+        { "source_key": "assignment", "title": "Solve graded assignment", "sequence": 1, "planned_minutes": 35 },
+        { "source_key": "quiz-prep", "title": "Quiz/end-term prep block", "sequence": 2, "planned_minutes": 20, "active_only_if": "exam_week" }
+      ],
+      "notes": "Base daily total 75 min (within the 60-90 min range). During a flagged exam_week, quiz-prep appends as a 3rd linear sub-task, bringing the day to 95 min."
+    },
+    {
+      "source_key": "dsa-systems",
+      "title": "DSA & Systems",
+      "schedule_type": "weekly_pattern",
+      "weekly_schedule": {
+        "mon": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "tue": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "wed": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "thu": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "fri": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "sat": [
+          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 30, "difficulty_from_phase": true },
+          { "source_key": "weekly-contest", "title": "Weekly contest", "sequence": 1, "planned_minutes": 60, "active_only_if": "phase.weekly_contest_active" },
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 2, "planned_minutes": 15 }
+        ],
+        "sun": [
+          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 0, "planned_minutes": 15 }
+        ]
+      },
+      "notes": "Mon-Fri = 60 min (heavier, within 45-75 range). Sat = 45 min normally, 105 min once weekly_contest_active (Phase 3+). Sun is the lightest day (15 min, HN only) so the week isn't solving-only every day."
+    },
+    {
+      "source_key": "data-science-ml",
+      "title": "Data Science / ML Applied",
+      "schedule_type": "weekly_pattern",
+      "weekly_schedule": {
+        "mon": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
+        "tue": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
+        "wed": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
+        "thu": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
+        "fri": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
+        "sat": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true }],
+        "sun": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true }]
+      },
+      "notes": "Matches the brief exactly: 120 min weekend Kaggle blocks, light 20 min weekday review. Not active before Phase 1 Month 6 (EDA/Data Cleaning start) -- gate weekday review off until that point if desired; weekend blocks can start once Kaggle Beginner comps begin in Phase 2, so keep light-review only in Phase 1's first 5 months."
+    },
+    {
+      "source_key": "portfolio-community",
+      "title": "Portfolio & Community",
+      "schedule_type": "weekly_pattern",
+      "day_sits_out_if_empty": true,
+      "weekly_schedule": {
+        "mon": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "tue": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "wed": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "thu": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "fri": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "sat": [
+          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
+          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+        ],
+        "sun": [
+          { "source_key": "producthunt-scan", "title": "Product Hunt scan", "sequence": 0, "planned_minutes": 20 }
+        ]
+      },
+      "notes": "Every day lands within the stated 15-35 min range (Mon-Sat = 30 min across 2 linear sub-tasks, Sun = 20 min solo). GitHub is not scheduled on Sunday, matching 'Mon-Sat' in the brief -- combined with Product Hunt being the only Sunday item, D never has a zero-sub-task day, so day_sits_out_if_empty is defined for correctness but won't currently trigger."
+    }
+  ]
+}
