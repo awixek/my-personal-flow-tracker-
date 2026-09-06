@@ -66,6 +66,21 @@ export default async function ProfilePage() {
     bucket.completed += st.completed_seconds;
   }
 
+  // Catch-up work is real study time attributed back to the day it was
+  // originally owed to, so it "fills in" that day's box retroactively.
+  const { data: catchUps } = await supabase
+    .from("catch_up_log")
+    .select("shortfall_date, resolved_seconds")
+    .eq("user_id", user.id);
+
+  for (const c of catchUps ?? []) {
+    totalCompletedSecondsAllTime += c.resolved_seconds;
+    const bucket = totalsByDate[c.shortfall_date];
+    if (bucket) {
+      bucket.completed = Math.min(bucket.planned, bucket.completed + c.resolved_seconds);
+    }
+  }
+
   const totalHours = (totalCompletedSecondsAllTime / 3600).toFixed(1);
   const weeks = buildHeatmapWeeks(startDate, today, totalsByDate);
 

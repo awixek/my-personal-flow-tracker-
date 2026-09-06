@@ -134,8 +134,76 @@ finish a sub-task, not while the clock is actively counting up.
 
 ## What's next
 
-- **Phase 4:** weekly catch-up rule (FIFO within the week, weekly lock)
-  + final polish.
+Nothing planned — Phase 4 (below) closes out the original blueprint. Future
+additions are whatever you want next.
+
+## Phase 4: catch-up rule, exam week, DS/ML gating, and a real notification
+
+**Run `supabase/phase4_migration.sql` in the Supabase SQL Editor first** —
+this update needs two new columns (`profiles.exam_week`,
+`catch_up_log.active_started_at`) and a uniqueness constraint that
+`schema.sql` didn't have.
+
+### Catch-up rule (§9)
+- **`lib/roadmap/catchup.ts`** — on every dashboard load: locks any
+  shortfall left over from a previous week, backfills a shortfall row for
+  any past day this week that fell short of its own planned time, and
+  returns the oldest unresolved one (FIFO).
+- The catch-up panel only appears once **today's own tasks are already
+  100% done** — it's extra time on top of today, not a replacement for it.
+- Its own Start/Pause timer works like a sub-task's, and resumes correctly
+  across a refresh (progress lives on the `catch_up_log` row itself).
+- Once a week rolls over, whatever wasn't caught up is permanently locked
+  — the panel simply won't offer it anymore.
+- The streak heatmap (`/profile`) now folds resolved catch-up time back
+  into the **original shortfall day's** box, so making up a missed day
+  visibly fills in that day's box, not today's.
+
+### Exam week toggle
+- A checkbox on the dashboard flips `profiles.exam_week`. While on, newly
+  generated days include the `quiz-prep` sub-task on IITM Coursework.
+- Since day-generation is idempotent (each day is only ever generated
+  once), toggling this only affects **days not yet generated** — turn it
+  on before the exam week actually starts, not mid-week.
+
+### Data Science/ML gating
+- Weekday light-review now only appears from **month 6** onward
+  (`active_only_if: "ds_month6"` in `roadmap.json`).
+- Weekend Kaggle blocks now only appear once **Phase 2** is active
+  (`active_only_if: "phase_gte_2"`).
+- Both are enforced in `generate-today.ts`, not just noted in comments.
+
+### Real notification (PWA)
+- **`public/manifest.json` + `public/sw.js` + `lib/notifications.ts`** —
+  the app is now installable ("Add to Home Screen"), and starting a timer
+  requests notification permission and shows a persistent notification
+  with a **Pause** action button. Tapping it pauses the timer even if the
+  app isn't the focused tab.
+- **Be realistic about this one:** there's no true background execution
+  on the web, so this only works while the browser/PWA process is still
+  alive in the background — reliable on **Android Chrome**, especially
+  once installed to the home screen. **iOS Safari's support is much more
+  limited** by Apple's own platform restrictions (notifications need iOS
+  16.4+, the app installed to the home screen, and even then background
+  behavior is far less reliable than Android). This is a real improvement
+  over the in-app-only bar from Phase 2, not a guaranteed always-on native
+  notification.
+
+## Added: Japanese Learning track (5th parallel Main Task)
+
+- New Main Task `japanese-learning` in `lib/roadmap/roadmap.json`, gated
+  with `starts_on: "2026-09-27"` — it won't appear on the dashboard at all
+  before that date, then appears automatically with no manual step needed.
+- 2 linear sub-tasks: a 25-min study block (video/app lesson) then a 10-min
+  review block (flashcards/notes) — 35 min/day total, inside the stated
+  30-40 min budget.
+- Runs independently of RealPathFlow's phase system — it's a flat daily
+  block regardless of which IITM phase is active; content progression
+  (scripts -> N5 -> N4 -> N3) is up to you and isn't tracked task-by-task.
+- **New engine capability added to support this:** any Main Task can now
+  carry a `starts_on` date in the roadmap file (see
+  `lib/roadmap/types.ts` / `generate-today.ts`) — useful for adding future
+  tracks without touching engine code again.
 
 ## Known gap raised separately (not part of any phase yet)
 

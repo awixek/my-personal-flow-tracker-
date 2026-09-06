@@ -4,16 +4,33 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { playVictoryBeep } from "@/lib/audio";
 import type { DbMainTask, DbSubTask } from "@/lib/roadmap/generate-today";
+import {
+  registerServiceWorker,
+  ensureNotificationPermission,
+  showTimerNotification,
+  clearTimerNotification,
+  listenForPauseRequests,
+} from "@/lib/notifications";
 
 interface OpenSessionInfo {
   subTaskId: string;
   startedAt: string;
 }
 
+interface CatchUpInfo {
+  id: string;
+  shortfallDate: string;
+  shortfallSeconds: number;
+  resolvedSeconds: number;
+  activeStartedAt: string | null;
+}
+
 interface Props {
   initialMainTasks: DbMainTask[];
   initialOpenSession: OpenSessionInfo | null;
   userId: string;
+  initialExamWeek: boolean;
+  initialCatchUp: CatchUpInfo | null;
 }
 
 // Find each Main Task's current sub-task: the first one in sequence
@@ -32,10 +49,17 @@ function fmtClock(totalSeconds: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
 }
 
+function formatDDMMYYYY(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 export default function DashboardClient({
   initialMainTasks,
   initialOpenSession,
   userId,
+  initialExamWeek,
+  initialCatchUp,
 }: Props) {
   const supabase = useMemo(() => createClient(), []);
 
@@ -49,7 +73,16 @@ export default function DashboardClient({
   );
   const [tick, setTick] = useState(0); // forces a re-render every second
   const [breakNotice, setBreakNotice] = useState<string | null>(null);
+  const [examWeek, setExamWeek] = useState(initialExamWeek);
+
+  const [catchUp, setCatchUp] = useState<CatchUpInfo | null>(initialCatchUp);
+  const [catchUpStartedAt, setCatchUpStartedAt] = useState<Date | null>(
+    initialCatchUp?.activeStartedAt ? new Date(initialCatchUp.activeStartedAt) : null
+  );
+
   const busyRef = useRef(false); // guards against double-fires on auto-advance
+  const catchUpBusyRef = useRef(false);
+  const swRegistrationRef = useRef<ServiceWorkerRegistration | null>(null);
 
   // Recover the open session's row id (needed to close it later).
   useEffect(() => {
@@ -72,6 +105,20 @@ export default function DashboardClient({
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  // PWA notification setup: register the service worker once, and let a
+  // notification's "Pause" action button reach back into this page.
+  useEffect(() => {
+    (async () => {
+      const reg = await registerServiceWorker();
+      swRegistrationRef.current = reg;
+    })();
+    const cleanup = listenForPauseRequests(() => {
+      handlePause();
+    });
+    return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function liveElapsedFor(st: DbSubTask): number {
@@ -124,6 +171,19 @@ export default function DashboardClient({
     );
   }
 
+  async function notifyStarted(title: string) {
+    const reg = swRegistrationRef.current;
+    if (!reg) return;
+    const granted = await ensureNotificationPermission();
+    if (!granted) return;
+    await showTimerNotification(reg, title, "Running — tap Pause to stop from here.");
+  }
+
+  async function clearNotification() {
+    const reg = swRegistrationRef.current;
+    if (reg) await clearTimerNotification(reg);
+  }
+
   async function handlePause() {
     if (!activeSubTaskId) return;
     const mt = findMainTaskOf(activeSubTaskId);
@@ -138,6 +198,7 @@ export default function DashboardClient({
     setActiveSubTaskId(null);
     setSessionId(null);
     setSessionStartedAt(null);
+    await clearNotification();
   }
 
   async function handleStart(subTaskId: string) {
@@ -170,6 +231,10 @@ export default function DashboardClient({
     setSessionId(data.id);
     setSessionStartedAt(startedAt);
     setBreakNotice(null);
+
+    const mt = findMainTaskOf(subTaskId);
+    const st = mt?.sub_tasks.find((s) => s.id === subTaskId);
+    if (st) await notifyStarted(st.title);
   }
 
   // Auto-advance: when the active sub-task's live elapsed time reaches
@@ -202,6 +267,7 @@ export default function DashboardClient({
       setActiveSubTaskId(null);
       setSessionId(null);
       setSessionStartedAt(null);
+      await clearNotification();
 
       const next = mt.sub_tasks
         .filter((s) => s.id !== st.id)
@@ -215,6 +281,78 @@ export default function DashboardClient({
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, activeSubTaskId]);
+
+  // ---- Exam week toggle ----
+  async function toggleExamWeek() {
+    const next = !examWeek;
+    setExamWeek(next);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ exam_week: next })
+      .eq("id", userId);
+    if (error) console.error("Failed to update exam_week:", error);
+  }
+
+  // ---- Catch-up: live elapsed + start/pause, same pattern as sub-tasks ----
+  function catchUpLiveElapsed(): number {
+    if (!catchUp) return 0;
+    let elapsed = catchUp.resolvedSeconds;
+    if (catchUpStartedAt) {
+      elapsed += (Date.now() - catchUpStartedAt.getTime()) / 1000;
+    }
+    return Math.min(catchUp.shortfallSeconds, elapsed);
+  }
+
+  async function handleCatchUpStart() {
+    if (!catchUp || catchUpBusyRef.current) return;
+    const startedAt = new Date();
+    const { error } = await supabase
+      .from("catch_up_log")
+      .update({ active_started_at: startedAt.toISOString() })
+      .eq("id", catchUp.id);
+    if (error) {
+      console.error("Failed to start catch-up timer:", error);
+      return;
+    }
+    setCatchUpStartedAt(startedAt);
+    await notifyStarted(`Catching up ${formatDDMMYYYY(catchUp.shortfallDate)}`);
+  }
+
+  async function handleCatchUpPause() {
+    if (!catchUp || !catchUpStartedAt) return;
+    const elapsed = catchUpLiveElapsed();
+    const { error } = await supabase
+      .from("catch_up_log")
+      .update({ resolved_seconds: elapsed, active_started_at: null })
+      .eq("id", catchUp.id);
+    if (error) console.error("Failed to save catch-up progress:", error);
+
+    setCatchUp({ ...catchUp, resolvedSeconds: elapsed });
+    setCatchUpStartedAt(null);
+    await clearNotification();
+  }
+
+  // Auto-close the catch-up session once its shortfall is fully repaid.
+  useEffect(() => {
+    if (!catchUp || !catchUpStartedAt || catchUpBusyRef.current) return;
+    const elapsed = catchUpLiveElapsed();
+    if (elapsed < catchUp.shortfallSeconds) return;
+
+    catchUpBusyRef.current = true;
+    (async () => {
+      const { error } = await supabase
+        .from("catch_up_log")
+        .update({ resolved_seconds: catchUp.shortfallSeconds, active_started_at: null })
+        .eq("id", catchUp.id);
+      if (error) console.error("Failed to close out catch-up:", error);
+      playVictoryBeep();
+      setCatchUp({ ...catchUp, resolvedSeconds: catchUp.shortfallSeconds });
+      setCatchUpStartedAt(null);
+      await clearNotification();
+      catchUpBusyRef.current = false;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick, catchUpStartedAt]);
 
   // ---- Derived numbers for rendering ----
   const dayTotals = mainTasks.reduce(
@@ -234,6 +372,11 @@ export default function DashboardClient({
     activeSubTaskId != null
       ? mainTasks.flatMap((m) => m.sub_tasks).find((s) => s.id === activeSubTaskId)
       : null;
+
+  // Catch-up only surfaces once today's own scheduled tasks are fully done
+  // and there's still an unresolved shortfall from earlier this week.
+  const showCatchUp = catchUp != null && dayPercent >= 100;
+  const catchUpDone = catchUp ? catchUpLiveElapsed() >= catchUp.shortfallSeconds : false;
 
   return (
     <div>
@@ -261,6 +404,11 @@ export default function DashboardClient({
         )}
       </div>
 
+      <label className="exam-week-toggle">
+        <input type="checkbox" checked={examWeek} onChange={toggleExamWeek} />
+        Exam week (adds quiz-prep to IITM Coursework — applies from tomorrow's tasks onward)
+      </label>
+
       {breakNotice && (
         <div className="break-notice">
           {breakNotice}
@@ -277,6 +425,30 @@ export default function DashboardClient({
               Let it continue
             </button>
           </span>
+        </div>
+      )}
+
+      {showCatchUp && catchUp && (
+        <div className="catchup-box">
+          <div className="catchup-head">
+            <span>
+              Catch-up available from <strong>{formatDDMMYYYY(catchUp.shortfallDate)}</strong>
+            </span>
+            <span className="catchup-clock">
+              {fmtClock(catchUpLiveElapsed())} / {fmtClock(catchUp.shortfallSeconds)}
+            </span>
+          </div>
+          {catchUpDone ? (
+            <span className="catchup-done">Caught up ✓</span>
+          ) : catchUpStartedAt ? (
+            <button className="timer-bar-btn" onClick={handleCatchUpPause}>
+              Pause
+            </button>
+          ) : (
+            <button className="timer-bar-btn" onClick={handleCatchUpStart}>
+              Start catch-up
+            </button>
+          )}
         </div>
       )}
 

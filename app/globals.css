@@ -609,3 +609,52 @@ button {
   bottom: 0;
   background: var(--liquid);
 }
+
+/* ---------- exam week toggle ---------- */
+.exam-week-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.exam-week-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--liquid);
+}
+
+/* ---------- catch-up panel ---------- */
+.catchup-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+}
+
+.catchup-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.catchup-clock {
+  font-family: var(--font-mono);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.catchup-done {
+  font-size: 14px;
+  color: var(--liquid);
+  font-weight: 600;
+}
