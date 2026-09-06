@@ -24,15 +24,16 @@ function isoDate(d: Date): string {
  *  - "daily" main tasks use the same sub_tasks every day
  *  - "weekly_pattern" main tasks look up today's day-of-week
  *  - sub-tasks gated by active_only_if are dropped unless their
- *    condition holds (exam_week is not wired up yet -> always false;
- *    phase.weekly_contest_active comes from the resolved phase)
+ *    condition holds (exam_week reads profiles.exam_week;
+ *    phase.weekly_contest_active / phase_gte_2 come from the resolved
+ *    phase; ds_month6 checks months elapsed since roadmap_start_date)
  *  - a main task with day_sits_out_if_empty and zero resolved sub-tasks
  *    that day is skipped entirely (no box, doesn't count toward the
  *    day's planned time)
  *  - time_share is computed as this task's planned seconds / the day's
  *    total planned seconds across all included main tasks
  */
-function resolveToday(startDate: Date, today: Date): ResolvedMainTask[] {
+function resolveToday(startDate: Date, today: Date, examWeek: boolean): ResolvedMainTask[] {
   const dayKey = dayKeyFor(today);
   const monthsIn = monthsElapsed(startDate, today);
   const phase = resolvePhase(roadmap, monthsIn);
@@ -40,6 +41,10 @@ function resolveToday(startDate: Date, today: Date): ResolvedMainTask[] {
   const included: { source_key: string; title: string; subs: ResolvedSubTask[] }[] = [];
 
   for (const mainTask of roadmap.main_tasks) {
+    if (mainTask.starts_on && isoDate(today) < mainTask.starts_on) {
+      continue; // this Main Task hasn't begun yet (its own start date, separate from roadmap_start_date)
+    }
+
     const defs =
       mainTask.schedule_type === "daily"
         ? mainTask.sub_tasks ?? []
@@ -47,10 +52,12 @@ function resolveToday(startDate: Date, today: Date): ResolvedMainTask[] {
 
     const activeDefs = defs.filter((d) => {
       if (!d.active_only_if) return true;
-      if (d.active_only_if === "exam_week") return false; // not wired up yet
+      if (d.active_only_if === "exam_week") return examWeek;
       if (d.active_only_if === "phase.weekly_contest_active") {
         return phase.weekly_contest_active;
       }
+      if (d.active_only_if === "ds_month6") return monthsIn >= 6;
+      if (d.active_only_if === "phase_gte_2") return phase.phase >= 2;
       return true;
     });
 
@@ -121,7 +128,7 @@ export async function ensureTodayTasks(
   // Make sure roadmap_start_date is set (first-ever dashboard load).
   const { data: profile } = await supabase
     .from("profiles")
-    .select("roadmap_start_date")
+    .select("roadmap_start_date, exam_week")
     .eq("id", userId)
     .single();
 
@@ -138,7 +145,7 @@ export async function ensureTodayTasks(
   const existing = await fetchTasksForDate(supabase, userId, taskDate);
   if (existing.length > 0) return existing;
 
-  const resolved = resolveToday(startDate, today);
+  const resolved = resolveToday(startDate, today, profile?.exam_week ?? false);
 
   for (let i = 0; i < resolved.length; i++) {
     const mt = resolved[i];

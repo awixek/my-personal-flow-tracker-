@@ -106,15 +106,15 @@
       "title": "Data Science / ML Applied",
       "schedule_type": "weekly_pattern",
       "weekly_schedule": {
-        "mon": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
-        "tue": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
-        "wed": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
-        "thu": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
-        "fri": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20 }],
-        "sat": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true }],
-        "sun": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true }]
+        "mon": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
+        "tue": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
+        "wed": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
+        "thu": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
+        "fri": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
+        "sat": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true, "active_only_if": "phase_gte_2" }],
+        "sun": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true, "active_only_if": "phase_gte_2" }]
       },
-      "notes": "Matches the brief exactly: 120 min weekend Kaggle blocks, light 20 min weekday review. Not active before Phase 1 Month 6 (EDA/Data Cleaning start) -- gate weekday review off until that point if desired; weekend blocks can start once Kaggle Beginner comps begin in Phase 2, so keep light-review only in Phase 1's first 5 months."
+      "notes": "Matches the brief exactly: 120 min weekend Kaggle blocks, light 20 min weekday review. Weekday light-review is gated (active_only_if: ds_month6) to only appear from month 6 onward. Weekend Kaggle blocks are gated (active_only_if: phase_gte_2) to only appear once Phase 2 is active, matching \"Kaggle Beginner comps\" starting there. Both gates are enforced by the engine, not just documented here."
     },
     {
       "source_key": "portfolio-community",
@@ -151,6 +151,17 @@
         ]
       },
       "notes": "Every day lands within the stated 15-35 min range (Mon-Sat = 30 min across 2 linear sub-tasks, Sun = 20 min solo). GitHub is not scheduled on Sunday, matching 'Mon-Sat' in the brief -- combined with Product Hunt being the only Sunday item, D never has a zero-sub-task day, so day_sits_out_if_empty is defined for correctness but won't currently trigger."
+    },
+    {
+      "source_key": "japanese-learning",
+      "title": "Japanese Learning (N5 -> N3)",
+      "schedule_type": "daily",
+      "starts_on": "2026-09-27",
+      "sub_tasks": [
+        { "source_key": "study-block", "title": "Lesson / app practice (YouTube, WaniKani, Bunpro, etc.)", "sequence": 0, "planned_minutes": 25 },
+        { "source_key": "review-block", "title": "Review & recall (Anki flashcards / notes)", "sequence": 1, "planned_minutes": 10 }
+      ],
+      "notes": "Independent of the RealPathFlow phases -- runs at a flat 35 min/day (within the user's stated 30-40 min budget) starting 2026-09-27, regardless of which RealPathFlow phase is active. Content (Hiragana/Katakana -> N5 -> N4 -> N3) progresses at the user's own pace via self-chosen resources; the engine only tracks the daily time block, not which JLPT phase they're on."
     }
   ]
 }

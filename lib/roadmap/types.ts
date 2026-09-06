@@ -5,7 +5,11 @@ export interface RoadmapSubTaskDef {
   title: string;
   sequence: number;
   planned_minutes: number;
-  active_only_if?: "exam_week" | "phase.weekly_contest_active";
+  active_only_if?:
+    | "exam_week"
+    | "phase.weekly_contest_active"
+    | "ds_month6"
+    | "phase_gte_2";
   difficulty_from_phase?: boolean;
   focus_from_phase?: boolean;
 }
@@ -17,6 +21,7 @@ export interface RoadmapMainTaskDef {
   sub_tasks?: RoadmapSubTaskDef[]; // used when schedule_type === "daily"
   weekly_schedule?: Partial<Record<DayKey, RoadmapSubTaskDef[]>>; // used when weekly_pattern
   day_sits_out_if_empty?: boolean;
+  starts_on?: string; // ISO yyyy-mm-dd — this Main Task doesn't exist before this date
   notes?: string;
 }
 
