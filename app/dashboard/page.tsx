@@ -2,8 +2,16 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ensureTodayTasks } from "@/lib/roadmap/generate-today";
+import { ensureCatchUpState } from "@/lib/roadmap/catchup";
 import SignOutButton from "./sign-out-button";
 import DashboardClient from "./dashboard-client";
+
+function todayIso(): string {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+    .toISOString()
+    .slice(0, 10);
+}
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -16,6 +24,16 @@ export default async function DashboardPage() {
   }
 
   const mainTasks = await ensureTodayTasks(supabase, user.id);
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("roadmap_start_date, exam_week")
+    .eq("id", user.id)
+    .single();
+
+  const catchUpTarget = profile?.roadmap_start_date
+    ? await ensureCatchUpState(supabase, user.id, profile.roadmap_start_date, todayIso())
+    : null;
 
   // Restore any timer session left running (e.g. page was refreshed).
   const { data: openSessions } = await supabase
@@ -47,6 +65,18 @@ export default async function DashboardPage() {
             : null
         }
         userId={user.id}
+        initialExamWeek={profile?.exam_week ?? false}
+        initialCatchUp={
+          catchUpTarget
+            ? {
+                id: catchUpTarget.id,
+                shortfallDate: catchUpTarget.shortfallDate,
+                shortfallSeconds: catchUpTarget.shortfallSeconds,
+                resolvedSeconds: catchUpTarget.resolvedSeconds,
+                activeStartedAt: catchUpTarget.activeStartedAt,
+              }
+            : null
+        }
       />
     </div>
   );
