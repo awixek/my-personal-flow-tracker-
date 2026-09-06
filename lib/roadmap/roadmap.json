@@ -156,7 +156,7 @@
       "source_key": "japanese-learning",
       "title": "Japanese Learning (N5 -> N3)",
       "schedule_type": "daily",
-      "starts_on": "2026-09-27",
+      "starts_on": "2026-09-6",
       "sub_tasks": [
         { "source_key": "study-block", "title": "Lesson / app practice (YouTube, WaniKani, Bunpro, etc.)", "sequence": 0, "planned_minutes": 25 },
         { "source_key": "review-block", "title": "Review & recall (Anki flashcards / notes)", "sequence": 1, "planned_minutes": 10 }
