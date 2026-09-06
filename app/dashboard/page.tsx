@@ -46,6 +46,7 @@ export default async function DashboardPage() {
             ? { subTaskId: openSession.sub_task_id, startedAt: openSession.started_at }
             : null
         }
+        userId={user.id}
       />
     </div>
   );

@@ -13,6 +13,7 @@ interface OpenSessionInfo {
 interface Props {
   initialMainTasks: DbMainTask[];
   initialOpenSession: OpenSessionInfo | null;
+  userId: string;
 }
 
 // Find each Main Task's current sub-task: the first one in sequence
@@ -34,6 +35,7 @@ function fmtClock(totalSeconds: number): string {
 export default function DashboardClient({
   initialMainTasks,
   initialOpenSession,
+  userId,
 }: Props) {
   const supabase = useMemo(() => createClient(), []);
 
@@ -88,10 +90,11 @@ export default function DashboardClient({
     if (!sessionId || !activeSubTaskId) return;
     const startedAt = sessionStartedAt ?? new Date();
     const endedAt = new Date(startedAt.getTime() + atSeconds * 1000);
-    await supabase
+    const { error } = await supabase
       .from("timer_sessions")
       .update({ ended_at: endedAt.toISOString() })
       .eq("id", sessionId);
+    if (error) console.error("Failed to close timer session:", error);
   }
 
   async function persistSubTaskProgress(
@@ -99,7 +102,7 @@ export default function DashboardClient({
     completedSeconds: number,
     status: DbSubTask["status"]
   ) {
-    await supabase
+    const { error } = await supabase
       .from("sub_tasks")
       .update({
         completed_seconds: completedSeconds,
@@ -107,6 +110,7 @@ export default function DashboardClient({
         completed_at: status === "completed" ? new Date().toISOString() : null,
       })
       .eq("id", subTaskId);
+    if (error) console.error("Failed to save sub-task progress:", error);
   }
 
   function updateLocalSubTask(subTaskId: string, patch: Partial<DbSubTask>) {
@@ -144,17 +148,26 @@ export default function DashboardClient({
     }
 
     const startedAt = new Date();
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("timer_sessions")
-      .insert({ user_id: (await supabase.auth.getUser()).data.user?.id, sub_task_id: subTaskId, started_at: startedAt.toISOString() })
+      .insert({ user_id: userId, sub_task_id: subTaskId, started_at: startedAt.toISOString() })
       .select()
       .single();
+
+    if (error || !data) {
+      // The DB write didn't actually happen — showing a running timer
+      // here would look fine until the next refresh wipes it, since
+      // nothing was ever persisted. Surface it instead of pretending.
+      console.error("Failed to start timer session:", error);
+      alert("Couldn't start the timer (connection issue) — please try again.");
+      return;
+    }
 
     await supabase.from("sub_tasks").update({ status: "active" }).eq("id", subTaskId);
     updateLocalSubTask(subTaskId, { status: "active" });
 
     setActiveSubTaskId(subTaskId);
-    setSessionId(data?.id ?? null);
+    setSessionId(data.id);
     setSessionStartedAt(startedAt);
     setBreakNotice(null);
   }
@@ -308,15 +321,24 @@ export default function DashboardClient({
                         ) : isCurrent ? (
                           isActive ? (
                             <span className="sub-task-live">
-                              {fmtClock(liveElapsedFor(st))}
+                              {fmtClock(liveElapsedFor(st))} /{" "}
+                              {fmtClock(st.planned_seconds)}
                             </span>
                           ) : (
-                            <button
-                              className="sub-task-start"
-                              onClick={() => handleStart(st.id)}
-                            >
-                              Start
-                            </button>
+                            <span className="sub-task-paused">
+                              {st.completed_seconds > 0 && (
+                                <span className="sub-task-progress">
+                                  {fmtClock(st.completed_seconds)} /{" "}
+                                  {fmtClock(st.planned_seconds)}
+                                </span>
+                              )}
+                              <button
+                                className="sub-task-start"
+                                onClick={() => handleStart(st.id)}
+                              >
+                                {st.completed_seconds > 0 ? "Resume" : "Start"}
+                              </button>
+                            </span>
                           )
                         ) : (
                           <span className="sub-task-locked">queued</span>
