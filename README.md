@@ -132,6 +132,40 @@ sub-task is **paused or completes** — not continuously while it's running.
 That's expected, not a bug — a box on `/profile` fills in once you pause or
 finish a sub-task, not while the clock is actively counting up.
 
+## Roadmap restructure: qualifier prep + delayed IITM start
+
+- **RealPathFlow's 4 Main Tasks** (IITM Coursework, DSA & Systems,
+  Data Science/ML, Portfolio & Community) now carry
+  `starts_on: "2026-09-27"` — they won't appear at all before then.
+- **Japanese Learning** moved up from `2026-09-27` to `2026-09-07` — it
+  now starts immediately, running alongside qualifier prep and then
+  continuing straight through into the RealPathFlow era with no gap.
+- **New: Qualifier Exam Prep**, a temporary 6th Main Task —
+  `2026-09-07` through `2026-09-26` only (20 days), 2 hours/day, one
+  subject per day: English gets the first 3 days, the remaining 17 days
+  rotate Maths / Statistics / Computational Thinking round-robin (17
+  doesn't split evenly into 3 — Maths and Statistics land on 6 days each,
+  Computational Thinking on 5). It uses a new schedule type,
+  **`date_map`** (a fixed calendar date -> sub-tasks lookup, alongside
+  the existing `daily` and `weekly_pattern` types) — see
+  `lib/roadmap/types.ts` / `generate-today.ts`. It has no explicit end
+  date because the date map simply has no entries past 2026-09-26, so it
+  stops appearing on its own.
+- **New: `phase_reference_start`** (`"2026-09-27"`) at the top of
+  `roadmap.json` — RealPathFlow's phase/month-elapsed math (which drives
+  `ds_month6`, `phase_gte_2`, and weekly-contest gating) now anchors on
+  this date instead of `profiles.roadmap_start_date`, since the IITM
+  journey genuinely begins on the 27th regardless of when you first
+  opened the dashboard.
+
+**If you already opened the dashboard today (or any day from today
+onward) before this update deployed**, today's tasks were generated
+under the *old* schedule and won't automatically switch — Phase 2's
+day-generation is intentionally idempotent (never regenerates a day that
+already exists). Run `supabase/optional_reset_today.sql` (fill in your
+user id first) to clear those rows so today regenerates under the new
+plan. Skip it entirely if you haven't opened the dashboard today yet.
+
 ## What's next
 
 Nothing planned — Phase 4 (below) closes out the original blueprint. Future

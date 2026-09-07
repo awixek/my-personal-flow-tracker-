@@ -2,14 +2,12 @@
   "roadmap_name": "RealPathFlow",
   "description": "DSA + Data Science, IITM BS Track — 4 parallel Main Tasks, time-share weighted, running across 4 macro Phases (Year 1 -> Year 4.5).",
   "version": "1.0",
-
   "notes_for_engine": [
     "This file is a TEMPLATE, not a day-by-day log. The Phase 2 loader expands it into actual main_tasks/sub_tasks rows (one row per real calendar date) by combining: (1) the weekly_schedule below for the day-of-week, (2) the active phase for that date from the phases table, and (3) any exam_week flag the user sets for IITM term-end weeks.",
     "time_share for each Main Task on a given day is NOT hardcoded — the engine computes it live as: (that Main Task's planned_seconds that day) / (sum of planned_seconds of every Main Task active that day). This matches schema.sql's main_tasks.time_share column, which the loader fills in at generation time.",
     "Main Task D (Portfolio & Community): on any day where zero of its sub_tasks are scheduled, D is NOT generated as a row at all that day -- no box, not counted in the day's total planned time. This was an explicit decision, not a default.",
     "Phase table below changes WHAT fills Main Task B's and C's sub-tasks (difficulty level / problem type), it does not change the structure (order, count, or duration) of sub-tasks -- store phase-driven content as metadata on the sub-task row (e.g. 'difficulty: Easy'), not as a new sub-task."
   ],
-
   "phases": [
     {
       "phase": 1,
@@ -52,18 +50,34 @@
       "weekly_contest_active": true
     }
   ],
-
   "main_tasks": [
     {
       "source_key": "iitm-coursework",
       "title": "IITM Coursework",
       "schedule_type": "daily",
       "sub_tasks": [
-        { "source_key": "video-content", "title": "Watch/complete week's video content", "sequence": 0, "planned_minutes": 40 },
-        { "source_key": "assignment", "title": "Solve graded assignment", "sequence": 1, "planned_minutes": 35 },
-        { "source_key": "quiz-prep", "title": "Quiz/end-term prep block", "sequence": 2, "planned_minutes": 20, "active_only_if": "exam_week" }
+        {
+          "source_key": "video-content",
+          "title": "Watch/complete week's video content",
+          "sequence": 0,
+          "planned_minutes": 40
+        },
+        {
+          "source_key": "assignment",
+          "title": "Solve graded assignment",
+          "sequence": 1,
+          "planned_minutes": 35
+        },
+        {
+          "source_key": "quiz-prep",
+          "title": "Quiz/end-term prep block",
+          "sequence": 2,
+          "planned_minutes": 20,
+          "active_only_if": "exam_week"
+        }
       ],
-      "notes": "Base daily total 75 min (within the 60-90 min range). During a flagged exam_week, quiz-prep appends as a 3rd linear sub-task, bringing the day to 95 min."
+      "notes": "Base daily total 75 min (within the 60-90 min range). During a flagged exam_week, quiz-prep appends as a 3rd linear sub-task, bringing the day to 95 min.",
+      "starts_on": "2026-09-27"
     },
     {
       "source_key": "dsa-systems",
@@ -71,50 +85,187 @@
       "schedule_type": "weekly_pattern",
       "weekly_schedule": {
         "mon": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 45,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "tue": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 45,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "wed": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 45,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "thu": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 45,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "fri": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 45, "difficulty_from_phase": true },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 45,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "sat": [
-          { "source_key": "leetcode-block", "title": "LeetCode problem-solving block", "sequence": 0, "planned_minutes": 30, "difficulty_from_phase": true },
-          { "source_key": "weekly-contest", "title": "Weekly contest", "sequence": 1, "planned_minutes": 60, "active_only_if": "phase.weekly_contest_active" },
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 2, "planned_minutes": 15 }
+          {
+            "source_key": "leetcode-block",
+            "title": "LeetCode problem-solving block",
+            "sequence": 0,
+            "planned_minutes": 30,
+            "difficulty_from_phase": true
+          },
+          {
+            "source_key": "weekly-contest",
+            "title": "Weekly contest",
+            "sequence": 1,
+            "planned_minutes": 60,
+            "active_only_if": "phase.weekly_contest_active"
+          },
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 2,
+            "planned_minutes": 15
+          }
         ],
         "sun": [
-          { "source_key": "hn-reading", "title": "HN/system-design reading", "sequence": 0, "planned_minutes": 15 }
+          {
+            "source_key": "hn-reading",
+            "title": "HN/system-design reading",
+            "sequence": 0,
+            "planned_minutes": 15
+          }
         ]
       },
-      "notes": "Mon-Fri = 60 min (heavier, within 45-75 range). Sat = 45 min normally, 105 min once weekly_contest_active (Phase 3+). Sun is the lightest day (15 min, HN only) so the week isn't solving-only every day."
+      "notes": "Mon-Fri = 60 min (heavier, within 45-75 range). Sat = 45 min normally, 105 min once weekly_contest_active (Phase 3+). Sun is the lightest day (15 min, HN only) so the week isn't solving-only every day.",
+      "starts_on": "2026-09-27"
     },
     {
       "source_key": "data-science-ml",
       "title": "Data Science / ML Applied",
       "schedule_type": "weekly_pattern",
       "weekly_schedule": {
-        "mon": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
-        "tue": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
-        "wed": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
-        "thu": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
-        "fri": [{ "source_key": "light-review", "title": "Weekday light review (dataset notes, model tuning log)", "sequence": 0, "planned_minutes": 20, "active_only_if": "ds_month6" }],
-        "sat": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true, "active_only_if": "phase_gte_2" }],
-        "sun": [{ "source_key": "kaggle-block", "title": "Kaggle notebook/competition work", "sequence": 0, "planned_minutes": 120, "focus_from_phase": true, "active_only_if": "phase_gte_2" }]
+        "mon": [
+          {
+            "source_key": "light-review",
+            "title": "Weekday light review (dataset notes, model tuning log)",
+            "sequence": 0,
+            "planned_minutes": 20,
+            "active_only_if": "ds_month6"
+          }
+        ],
+        "tue": [
+          {
+            "source_key": "light-review",
+            "title": "Weekday light review (dataset notes, model tuning log)",
+            "sequence": 0,
+            "planned_minutes": 20,
+            "active_only_if": "ds_month6"
+          }
+        ],
+        "wed": [
+          {
+            "source_key": "light-review",
+            "title": "Weekday light review (dataset notes, model tuning log)",
+            "sequence": 0,
+            "planned_minutes": 20,
+            "active_only_if": "ds_month6"
+          }
+        ],
+        "thu": [
+          {
+            "source_key": "light-review",
+            "title": "Weekday light review (dataset notes, model tuning log)",
+            "sequence": 0,
+            "planned_minutes": 20,
+            "active_only_if": "ds_month6"
+          }
+        ],
+        "fri": [
+          {
+            "source_key": "light-review",
+            "title": "Weekday light review (dataset notes, model tuning log)",
+            "sequence": 0,
+            "planned_minutes": 20,
+            "active_only_if": "ds_month6"
+          }
+        ],
+        "sat": [
+          {
+            "source_key": "kaggle-block",
+            "title": "Kaggle notebook/competition work",
+            "sequence": 0,
+            "planned_minutes": 120,
+            "focus_from_phase": true,
+            "active_only_if": "phase_gte_2"
+          }
+        ],
+        "sun": [
+          {
+            "source_key": "kaggle-block",
+            "title": "Kaggle notebook/competition work",
+            "sequence": 0,
+            "planned_minutes": 120,
+            "focus_from_phase": true,
+            "active_only_if": "phase_gte_2"
+          }
+        ]
       },
-      "notes": "Matches the brief exactly: 120 min weekend Kaggle blocks, light 20 min weekday review. Weekday light-review is gated (active_only_if: ds_month6) to only appear from month 6 onward. Weekend Kaggle blocks are gated (active_only_if: phase_gte_2) to only appear once Phase 2 is active, matching \"Kaggle Beginner comps\" starting there. Both gates are enforced by the engine, not just documented here."
+      "notes": "Matches the brief exactly: 120 min weekend Kaggle blocks, light 20 min weekday review. Weekday light-review is gated (active_only_if: ds_month6) to only appear from month 6 onward. Weekend Kaggle blocks are gated (active_only_if: phase_gte_2) to only appear once Phase 2 is active, matching \"Kaggle Beginner comps\" starting there. Both gates are enforced by the engine, not just documented here.",
+      "starts_on": "2026-09-27"
     },
     {
       "source_key": "portfolio-community",
@@ -123,45 +274,290 @@
       "day_sits_out_if_empty": true,
       "weekly_schedule": {
         "mon": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "linkedin-update",
+            "title": "LinkedIn update",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "tue": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "twitter-post",
+            "title": "Twitter/X build-in-public post",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "wed": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "linkedin-update",
+            "title": "LinkedIn update",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "thu": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "twitter-post",
+            "title": "Twitter/X build-in-public post",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "fri": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "linkedin-update", "title": "LinkedIn update", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "linkedin-update",
+            "title": "LinkedIn update",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "sat": [
-          { "source_key": "github-commit", "title": "GitHub commit + push", "sequence": 0, "planned_minutes": 15 },
-          { "source_key": "twitter-post", "title": "Twitter/X build-in-public post", "sequence": 1, "planned_minutes": 15 }
+          {
+            "source_key": "github-commit",
+            "title": "GitHub commit + push",
+            "sequence": 0,
+            "planned_minutes": 15
+          },
+          {
+            "source_key": "twitter-post",
+            "title": "Twitter/X build-in-public post",
+            "sequence": 1,
+            "planned_minutes": 15
+          }
         ],
         "sun": [
-          { "source_key": "producthunt-scan", "title": "Product Hunt scan", "sequence": 0, "planned_minutes": 20 }
+          {
+            "source_key": "producthunt-scan",
+            "title": "Product Hunt scan",
+            "sequence": 0,
+            "planned_minutes": 20
+          }
         ]
       },
-      "notes": "Every day lands within the stated 15-35 min range (Mon-Sat = 30 min across 2 linear sub-tasks, Sun = 20 min solo). GitHub is not scheduled on Sunday, matching 'Mon-Sat' in the brief -- combined with Product Hunt being the only Sunday item, D never has a zero-sub-task day, so day_sits_out_if_empty is defined for correctness but won't currently trigger."
+      "notes": "Every day lands within the stated 15-35 min range (Mon-Sat = 30 min across 2 linear sub-tasks, Sun = 20 min solo). GitHub is not scheduled on Sunday, matching 'Mon-Sat' in the brief -- combined with Product Hunt being the only Sunday item, D never has a zero-sub-task day, so day_sits_out_if_empty is defined for correctness but won't currently trigger.",
+      "starts_on": "2026-09-27"
     },
     {
       "source_key": "japanese-learning",
       "title": "Japanese Learning (N5 -> N3)",
       "schedule_type": "daily",
-      "starts_on": "2026-09-6",
+      "starts_on": "2026-09-07",
       "sub_tasks": [
-        { "source_key": "study-block", "title": "Lesson / app practice (YouTube, WaniKani, Bunpro, etc.)", "sequence": 0, "planned_minutes": 25 },
-        { "source_key": "review-block", "title": "Review & recall (Anki flashcards / notes)", "sequence": 1, "planned_minutes": 10 }
+        {
+          "source_key": "study-block",
+          "title": "Lesson / app practice (YouTube, WaniKani, Bunpro, etc.)",
+          "sequence": 0,
+          "planned_minutes": 25
+        },
+        {
+          "source_key": "review-block",
+          "title": "Review & recall (Anki flashcards / notes)",
+          "sequence": 1,
+          "planned_minutes": 10
+        }
       ],
-      "notes": "Independent of the RealPathFlow phases -- runs at a flat 35 min/day (within the user's stated 30-40 min budget) starting 2026-09-27, regardless of which RealPathFlow phase is active. Content (Hiragana/Katakana -> N5 -> N4 -> N3) progresses at the user's own pace via self-chosen resources; the engine only tracks the daily time block, not which JLPT phase they're on."
+      "notes": "Independent of the RealPathFlow phases -- runs at a flat 35 min/day (within the user's stated 30-40 min budget) starting 2026-09-07 (moved up to run alongside qualifier exam prep, ahead of RealPathFlow's 2026-09-27 start), regardless of which RealPathFlow phase is active. Content (Hiragana/Katakana -> N5 -> N4 -> N3) progresses at the user's own pace via self-chosen resources; the engine only tracks the daily time block, not which JLPT phase they're on."
+    },
+    {
+      "source_key": "qualifier-exam-prep",
+      "title": "Qualifier Exam Prep",
+      "schedule_type": "date_map",
+      "date_schedule": {
+        "2026-09-07": [
+          {
+            "source_key": "english-block",
+            "title": "Qualifier prep — English",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-08": [
+          {
+            "source_key": "english-block",
+            "title": "Qualifier prep — English",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-09": [
+          {
+            "source_key": "english-block",
+            "title": "Qualifier prep — English",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-10": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-11": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-12": [
+          {
+            "source_key": "computational-thinking-block",
+            "title": "Qualifier prep — Computational Thinking",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-13": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-14": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-15": [
+          {
+            "source_key": "computational-thinking-block",
+            "title": "Qualifier prep — Computational Thinking",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-16": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-17": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-18": [
+          {
+            "source_key": "computational-thinking-block",
+            "title": "Qualifier prep — Computational Thinking",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-19": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-20": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-21": [
+          {
+            "source_key": "computational-thinking-block",
+            "title": "Qualifier prep — Computational Thinking",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-22": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-23": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-24": [
+          {
+            "source_key": "computational-thinking-block",
+            "title": "Qualifier prep — Computational Thinking",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-25": [
+          {
+            "source_key": "maths-block",
+            "title": "Qualifier prep — Maths",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ],
+        "2026-09-26": [
+          {
+            "source_key": "statistics-block",
+            "title": "Qualifier prep — Statistics",
+            "sequence": 0,
+            "planned_minutes": 120
+          }
+        ]
+      },
+      "notes": "Temporary track, 20 days (2026-09-07 to 2026-09-26) only, running until RealPathFlow's IITM tasks begin on 2026-09-27. 2 hours/day, one subject per day: English gets the first 3 days (2026-09-07, 2026-09-08, 2026-09-09), the remaining 17 days rotate evenly across Maths/Statistics/Computational Thinking (round-robin, so 17 doesn't divide evenly: Maths and Statistics each get 6 days, Computational Thinking gets 5). No date_schedule entry exists past 2026-09-26, so this Main Task naturally stops appearing on its own — no starts_on/ends_on needed."
     }
-  ]
+  ],
+  "phase_reference_start": "2026-09-27"
 }

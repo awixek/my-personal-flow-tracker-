@@ -17,9 +17,10 @@ export interface RoadmapSubTaskDef {
 export interface RoadmapMainTaskDef {
   source_key: string;
   title: string;
-  schedule_type: "daily" | "weekly_pattern";
+  schedule_type: "daily" | "weekly_pattern" | "date_map";
   sub_tasks?: RoadmapSubTaskDef[]; // used when schedule_type === "daily"
   weekly_schedule?: Partial<Record<DayKey, RoadmapSubTaskDef[]>>; // used when weekly_pattern
+  date_schedule?: Record<string, RoadmapSubTaskDef[]>; // used when date_map — keyed by ISO yyyy-mm-dd
   day_sits_out_if_empty?: boolean;
   starts_on?: string; // ISO yyyy-mm-dd — this Main Task doesn't exist before this date
   notes?: string;
@@ -40,6 +41,7 @@ export interface RoadmapConfig {
   roadmap_name: string;
   description: string;
   version: string;
+  phase_reference_start?: string; // ISO yyyy-mm-dd — phase/months-elapsed math anchors here, not profiles.roadmap_start_date
   phases: RoadmapPhase[];
   main_tasks: RoadmapMainTaskDef[];
 }
