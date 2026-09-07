@@ -33,21 +33,27 @@ function isoDate(d: Date): string {
  *  - time_share is computed as this task's planned seconds / the day's
  *    total planned seconds across all included main tasks
  */
-function resolveToday(startDate: Date, today: Date, examWeek: boolean): ResolvedMainTask[] {
+function resolveToday(today: Date, examWeek: boolean): ResolvedMainTask[] {
   const dayKey = dayKeyFor(today);
-  const monthsIn = monthsElapsed(startDate, today);
+  const phaseAnchor = roadmap.phase_reference_start
+    ? new Date(roadmap.phase_reference_start + "T00:00:00Z")
+    : today;
+  const monthsIn = monthsElapsed(phaseAnchor, today);
   const phase = resolvePhase(roadmap, monthsIn);
+  const todayIso = isoDate(today);
 
   const included: { source_key: string; title: string; subs: ResolvedSubTask[] }[] = [];
 
   for (const mainTask of roadmap.main_tasks) {
-    if (mainTask.starts_on && isoDate(today) < mainTask.starts_on) {
+    if (mainTask.starts_on && todayIso < mainTask.starts_on) {
       continue; // this Main Task hasn't begun yet (its own start date, separate from roadmap_start_date)
     }
 
     const defs =
       mainTask.schedule_type === "daily"
         ? mainTask.sub_tasks ?? []
+        : mainTask.schedule_type === "date_map"
+        ? mainTask.date_schedule?.[todayIso] ?? []
         : mainTask.weekly_schedule?.[dayKey] ?? [];
 
     const activeDefs = defs.filter((d) => {
@@ -126,16 +132,15 @@ export async function ensureTodayTasks(
   const taskDate = isoDate(today);
 
   // Make sure roadmap_start_date is set (first-ever dashboard load).
+  // This still drives the heatmap's start boundary — it's independent of
+  // roadmap.phase_reference_start, which anchors IITM phase math instead.
   const { data: profile } = await supabase
     .from("profiles")
     .select("roadmap_start_date, exam_week")
     .eq("id", userId)
     .single();
 
-  let startDate = today;
-  if (profile?.roadmap_start_date) {
-    startDate = new Date(profile.roadmap_start_date + "T00:00:00Z");
-  } else {
+  if (!profile?.roadmap_start_date) {
     await supabase
       .from("profiles")
       .update({ roadmap_start_date: taskDate })
@@ -145,7 +150,7 @@ export async function ensureTodayTasks(
   const existing = await fetchTasksForDate(supabase, userId, taskDate);
   if (existing.length > 0) return existing;
 
-  const resolved = resolveToday(startDate, today, profile?.exam_week ?? false);
+  const resolved = resolveToday(today, profile?.exam_week ?? false);
 
   for (let i = 0; i < resolved.length; i++) {
     const mt = resolved[i];
